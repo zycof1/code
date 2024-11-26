@@ -1,0 +1,90 @@
+#include <iostream>
+using namespace std;
+
+// Node structure for Threaded Binary Tree
+class Node {
+    public:
+    int data;
+    Node *left, *right;
+    bool rightThread; // True if right pointer is a thread
+
+    Node(int data) {
+        this->data = data;
+        left = right = nullptr;
+        rightThread = false;
+    }
+};
+
+// Function to insert a node in a threaded binary tree
+Node* insert(Node* root, int key) {
+    Node* parent = nullptr;
+    Node* current = root;
+
+    while (current != nullptr) {
+        parent = current;
+        if (key < current->data) {
+            if (current->left == nullptr) break;
+            current = current->left;
+        } else {
+            if (!current->rightThread) {
+                current = current->right;
+            } else break;
+        }
+    }
+
+    Node* newNode = new Node(key);
+
+    if (parent == nullptr) {
+        return newNode;
+    } else if (key < parent->data) {
+        parent->left = newNode;
+        newNode->right = parent;
+        newNode->rightThread = true;
+    } else {
+        newNode->right = parent->right;
+        newNode->rightThread = parent->rightThread;
+        parent->rightThread = false;
+        parent->right = newNode;
+    }
+
+    return root;
+}
+
+// Inorder traversal of a threaded binary tree
+void inorderTraversal(Node* root) {
+    if (root == nullptr) return;
+
+    Node* current = root;
+    // Go to the leftmost node
+    while (current->left != nullptr) {
+        current = current->left;
+    }
+
+    while (current != nullptr) {
+        cout << current->data << " ";
+        if (current->rightThread) {
+            current = current->right;
+        } else {
+            current = current->right;
+            while (current && current->left != nullptr) {
+                current = current->left;
+            }
+        }
+    }
+}
+
+int main() {
+
+
+    Node* root = nullptr;
+    root = insert(root, 20);
+    root = insert(root, 10);
+    root = insert(root, 30);
+    root = insert(root, 5);
+    root = insert(root, 15);
+    root = insert(root, 25);
+
+    cout << "Inorder Traversal: ";
+    inorderTraversal(root);
+    return 0;
+}

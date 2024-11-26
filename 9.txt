@@ -1,0 +1,45 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class MarksAnalyzer {
+private:
+    // Min heap for tracking minimum values
+    priority_queue<int, vector<int>, greater<int>> minHeap;
+    
+    // Max heap for tracking maximum values
+    priority_queue<int> maxHeap;
+
+public:
+    // Add student marks to both heaps
+    void addMarks(int marks) {
+        minHeap.push(marks);
+        maxHeap.push(marks);
+    }
+    void print(){
+        priority_queue<int> tempMaxHeap = maxHeap;
+        priority_queue<int, vector<int>, greater<int>> tempMinHeap = minHeap;
+        cout<<"MAXIMUM MARKS:"<<tempMaxHeap.top()<<endl;
+        cout<<"MINIMUM MARKS:"<<tempMinHeap.top()<<endl;
+    }
+
+};
+
+int main() {
+    MarksAnalyzer analyzer;
+
+    // Sample marks of second-year students
+    vector<int> marks = {85, 92, 78, 95, 88, 76, 90, 82};
+
+    // Add marks to the analyzer
+    for (int mark : marks) {
+        analyzer.addMarks(mark);
+    }
+    analyzer.print();
+
+   
+
+    return 0;
+}

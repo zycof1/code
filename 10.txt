@@ -1,0 +1,139 @@
+#include <iostream>
+#include <string>
+#include <list>
+#include <unordered_map>
+#include <vector>
+
+using namespace std;
+
+// Define a UserProfile structure to hold user data
+struct UserProfile {
+    string username;
+    vector<string> posts;     // List of posts by the user
+    vector<string> comments;  // List of comments by the user
+    vector<string> preferences; // User preferences (e.g., notifications, theme, etc.)
+
+    // Constructor to initialize user profile with username
+    UserProfile(string user) : username(user) {}
+    
+    // Methods to add posts, comments, and preferences
+    void addPost(const string& post) {
+        posts.push_back(post);
+    }
+
+    void addComment(const string& comment) {
+        comments.push_back(comment);
+    }
+
+    void addPreference(const string& preference) {
+        preferences.push_back(preference);
+    }
+
+    // Method to print the user profile details
+    void printProfile() const {
+        cout << "User: " << username << endl;
+        cout << "Posts: ";
+        for (const auto& post : posts) {
+            cout << post << "; ";
+        }
+        cout << endl;
+
+        cout << "Comments: ";
+        for (const auto& comment : comments) {
+            cout << comment << "; ";
+        }
+        cout << endl;
+
+        cout << "Preferences: ";
+        for (const auto& preference : preferences) {
+            cout << preference << "; ";
+        }
+        cout << endl;
+    }
+};
+
+// Hash table class for user profiles
+class UserProfileHashTable {
+private:
+    // The hash table is an array of linked lists (to handle collisions via chaining)
+    unordered_map<string, UserProfile> table;
+
+public:
+    // Method to insert a new user profile into the hash table
+    void addUser(const string& username) {
+        if (table.find(username) == table.end()) {
+            table[username] = UserProfile(username);
+            cout << "User " << username << " added successfully." << endl;
+        } else {
+            cout << "User " << username << " already exists." << endl;
+        }
+    }
+
+    // Method to get a user profile by username
+    UserProfile* getUser(const string& username) {
+        if (table.find(username) != table.end()) {
+            return &table[username];
+        } else {
+            cout << "User " << username << " not found!" << endl;
+            return nullptr;
+        }
+    }
+
+    // Method to update the user's post
+    void addPostToUser(const string& username, const string& post) {
+        UserProfile* user = getUser(username);
+        if (user) {
+            user->addPost(post);
+            cout << "Post added to user " << username << endl;
+        }
+    }
+
+    // Method to update the user's comment
+    void addCommentToUser(const string& username, const string& comment) {
+        UserProfile* user = getUser(username);
+        if (user) {
+            user->addComment(comment);
+            cout << "Comment added to user " << username << endl;
+        }
+    }
+
+    // Method to update the user's preferences
+    void addPreferenceToUser(const string& username, const string& preference) {
+        UserProfile* user = getUser(username);
+        if (user) {
+            user->addPreference(preference);
+            cout << "Preference added to user " << username << endl;
+        }
+    }
+
+    // Method to display the user's profile
+    void printUserProfile(const string& username) {
+        UserProfile* user = getUser(username);
+        if (user) {
+            user->printProfile();
+        }
+    }
+};
+
+int main() {
+    UserProfileHashTable hashTable;
+
+    // Adding some users to the platform
+    hashTable.addUser("john_doe");
+    hashTable.addUser("jane_smith");
+
+    // Adding posts, comments, and preferences
+    hashTable.addPostToUser("john_doe", "This is my first post!");
+    hashTable.addCommentToUser("john_doe", "Great post!");
+    hashTable.addPreferenceToUser("john_doe", "Receive email notifications");
+
+    hashTable.addPostToUser("jane_smith", "Excited for my first post!");
+    hashTable.addCommentToUser("jane_smith", "Love this!");
+    hashTable.addPreferenceToUser("jane_smith", "Dark mode enabled");
+
+    // Print user profiles
+    hashTable.printUserProfile("john_doe");
+    hashTable.printUserProfile("jane_smith");
+
+    return 0;
+}

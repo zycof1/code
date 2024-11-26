@@ -1,0 +1,38 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Road { int src, dest, cost; };
+
+int findMinCost(int cities, vector<Road>& roads) {
+    vector<int> parent(cities);
+    for (int i = 0; i < cities; i++) parent[i] = i;
+
+    sort(roads.begin(), roads.end(), [](const Road& a, const Road& b) { return a.cost < b.cost; });
+
+    int totalCost = 0;
+    for (auto& road : roads) {
+        int x = road.src, y = road.dest;
+        while (parent[x] != x) x = parent[x];
+        while (parent[y] != y) y = parent[y];
+        
+        if (x != y) {
+            parent[y] = x;
+            totalCost += road.cost;
+        }
+    }
+    return totalCost;
+}
+
+int main() {
+    int cities = 5;
+    vector<Road> roads = {
+        {0, 1, 10}, {0, 2, 6}, {0, 3, 5}, 
+        {1, 3, 15}, {2, 3, 4}, {2, 4, 8}, {3, 4, 16}
+    };
+
+    cout << "Minimum Road Network Cost: " 
+              << findMinCost(cities, roads) << endl;
+    return 0;
+}

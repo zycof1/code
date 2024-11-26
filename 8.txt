@@ -1,0 +1,65 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <limits.h> // For INT_MAX
+using namespace std;
+
+// Function to implement Dijkstra's Algorithm
+void dijkstra(int src, int n, vector<vector<pair<int, int>>>& graph) {
+    vector<int> dist(n, INT_MAX); // Stores shortest distances from src
+    dist[src] = 0;
+
+    // Min-heap to select the node with the smallest distance
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+    pq.push({0, src}); // {distance, node}
+
+    while (!pq.empty()) {
+        int d = pq.top().first; // Current distance
+        int u = pq.top().second; // Current node
+        pq.pop();
+
+        if (d > dist[u]) continue; // Ignore outdated distance
+
+        for (auto& edge : graph[u]) {
+            int v = edge.first; // Neighbor node
+            int w = edge.second; // Edge weight
+
+            if (dist[u] + w < dist[v]) { // Relax the edge
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+
+    // Output the shortest distances
+    for (int i = 0; i < n; ++i) {
+        if (dist[i] == INT_MAX)
+            cout << "Distance from " << src << " to " << i << ": INF\n";
+        else
+            cout << "Distance from " << src << " to " << i << ": " << dist[i] << "\n";
+    }
+}
+
+int main() {
+    int n, m; // n = number of nodes, m = number of edges
+    cout << "Enter number of nodes and edges: ";
+    cin >> n >> m;
+
+    vector<vector<pair<int, int>>> graph(n); // Adjacency list
+
+    cout << "Enter edges (u, v, weight):\n";
+    for (int i = 0; i < m; ++i) {
+        int u, v, w;
+        cin >> u >> v >> w; // Edge from u to v with weight w
+        graph[u].push_back({v, w});
+        graph[v].push_back({u, w}); // For undirected graph
+    }
+
+    int src;
+    cout << "Enter the source node: ";
+    cin >> src;
+
+    dijkstra(src, n, graph);
+
+    return 0;
+}
