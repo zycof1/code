@@ -1,0 +1,122 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Contact {
+public:
+    string name;
+    string phone_number;
+    Contact(string n, string p) : name(n), phone_number(p) {}
+};
+
+class AVLNode {
+public:
+    Contact* contact;
+    AVLNode* left;
+    AVLNode* right;
+    int height;
+    AVLNode(Contact* c) : contact(c), left(nullptr), right(nullptr), height(1) {}
+};
+
+class PhoneBook {
+private:
+    AVLNode* root;
+
+    int height(AVLNode* node) {
+        return node ? node->height : 0;
+    }
+
+    int balance(AVLNode* node) {
+        return node ? height(node->left) - height(node->right) : 0;
+    }
+
+    AVLNode* rightRotate(AVLNode* y) {
+        AVLNode* x = y->left;
+        y->left = x->right;
+        x->right = y;
+        y->height = max(height(y->left), height(y->right)) + 1;
+        x->height = max(height(x->left), height(x->right)) + 1;
+        return x;
+    }
+
+    AVLNode* leftRotate(AVLNode* x) {
+        AVLNode* y = x->right;
+        x->right = y->left;
+        y->left = x;
+        x->height = max(height(x->left), height(x->right)) + 1;
+        y->height = max(height(y->left), height(y->right)) + 1;
+        return y;
+    }
+
+    AVLNode* insert(AVLNode* node, Contact* contact) {
+        if (!node) return new AVLNode(contact);
+
+        if (contact->phone_number < node->contact->phone_number)
+            node->left = insert(node->left, contact);
+        else if (contact->phone_number > node->contact->phone_number)
+            node->right = insert(node->right, contact);
+
+        node->height = max(height(node->left), height(node->right)) + 1;
+        int balance_factor = balance(node);
+
+        if (balance_factor > 1 && contact->phone_number < node->left->contact->phone_number)
+            return rightRotate(node);
+        if (balance_factor < -1 && contact->phone_number > node->right->contact->phone_number)
+            return leftRotate(node);
+        if (balance_factor > 1 && contact->phone_number > node->left->contact->phone_number) {
+            node->left = leftRotate(node->left);
+            return rightRotate(node);
+        }
+        if (balance_factor < -1 && contact->phone_number < node->right->contact->phone_number) {
+            node->right = rightRotate(node->right);
+            return leftRotate(node);
+        }
+
+        return node;
+    }
+
+    void inOrder(AVLNode* node) {
+        if (node) {
+            inOrder(node->left);
+            cout << node->contact->name << ": " << node->contact->phone_number << endl;
+            inOrder(node->right);
+        }
+    }
+
+public:
+    PhoneBook() : root(nullptr) {}
+
+    void insertContact(string name, string phone_number) {
+        Contact* contact = new Contact(name, phone_number);
+        root = insert(root, contact);
+    }
+
+    void searchContact(string phone_number) {
+        AVLNode* node = root;
+        while (node) {
+            if (phone_number == node->contact->phone_number) {
+                cout << "Found: " << node->contact->name << ": " << node->contact->phone_number << endl;
+                return;
+            }
+            node = (phone_number < node->contact->phone_number) ? node->left : node->right;
+        }
+        cout << "Not found." << endl;
+    }
+
+    void printContacts() {
+        inOrder(root);
+    }
+};
+
+int main() {
+    PhoneBook pb;
+    pb.insertContact("John Doe", "5551234");
+    pb.insertContact("Alice Smith", "5559876");
+    pb.insertContact("Bob Johnson", "5552345");
+
+    pb.printContacts();
+    pb.searchContact("5551234");
+    pb.searchContact("5550000");
+
+    return 0;
+}
